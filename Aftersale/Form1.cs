@@ -707,9 +707,46 @@ namespace Aftersale
         }
         private void buildInvoiceFile(DataTable parmInvoice)
         {
+            
+
+            if(parmInvoice.Rows.Count==0)
+            {
+                return;
+            }
+            else
+            {
+                
+            }
+            //获取发票商品编码信息
             DataTable faPiaoDaiMa = new DataTable();
+            DataTable fapioaData = new DataTable();
+            fapioaData.Columns.Add("mc");
+            fapioaData.Columns.Add("dw");
+            fapioaData.Columns.Add("bm");
+            fapioaData.Columns.Add("xbm");
+            fapioaData.Columns.Add("sl");
+            fapioaData.Columns.Add("je");
+            fapioaData.Columns.Add("bb");
 
-
+            MySqlDataAdapter da = new MySqlDataAdapter("SELECT * FROM `fapiaobianma`", conn);
+            da.Fill(faPiaoDaiMa);
+            foreach (DataRow dr in parmInvoice.Rows)
+            {
+                bool zd = false;
+                foreach (DataRow dr2 in faPiaoDaiMa.Rows)
+                {
+                    if(dr["leixing"].ToString()== dr["fenlei"].ToString())
+                    {
+                        zd = true;
+                        break;
+                    }                    
+                }
+                if (!zd)
+                {
+                    MessageBox.Show(dr["leixing"].ToString() + "没有发票编码");
+                    return;
+                }
+            }
 
             XmlDocument xmlDoc = new XmlDocument();
             //创建类型声明节点
@@ -745,8 +782,10 @@ namespace Aftersale
 
             XmlNode node4 = xmlDoc.CreateNode(XmlNodeType.Element, "Spxx", null);
             node3.AppendChild(node4);
-            for(int i=0;i<2;i++)
+            for(int i=0;i< parmInvoice.Rows.Count; i++)
             {
+
+                
                 XmlNode node5 = xmlDoc.CreateNode(XmlNodeType.Element, "Sph", null);
                 CreateNode(xmlDoc, node5, "Xh", (i+1).ToString());//序号
                 CreateNode(xmlDoc, node5, "Spmc", "1");////商品名称，金额为负数时此行是折扣行，折扣行的商品名称应与上一行的商品名称一致（100字节）
